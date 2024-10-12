@@ -2,21 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.DTOs;
 using WebApplication1.Models;
-using WebApplication1.Repositories;
+using WebApplication1.Repositories.Interfaces;
+using WebApplication1.Services.Interfaces;
 using WebApplication1.ViewModels;
 
 namespace WebApplication1.Services
 {
-    public interface IUserService
-    {
-        Task<UserViewModel> CreateAsync(CreateUserDto createUserDto, CancellationToken cancel = default);
-        Task<IEnumerable<UserViewModel>> FindAllAsync(CancellationToken cancel = default);
-        Task<UserViewModel> FindOneAsync(int id, CancellationToken cancel = default);
-        Task<UserViewModel> UpdateAsync(UpdateUserDto updateUserDto, CancellationToken cancel = default);
-        Task<UserViewModel> SoftDeleteAsync(int id, CancellationToken cancel = default);
-        Task<UserViewModel> RemoveAsync(int id, CancellationToken cancel = default);
-    }
-
     public class UserService : IUserService
     {
         private readonly IMapper _mapper;
@@ -40,7 +31,10 @@ namespace WebApplication1.Services
 
         public async Task<IEnumerable<UserViewModel>> FindAllAsync(CancellationToken cancel)
         {
-            var userList = await _userRepository.FindAllAsync(cancel);
+            var userList = await _dbContext.Users
+                .Where(x => !x.IsDeleted)
+                .AsNoTracking()
+                .ToListAsync(cancel);
             return _mapper.Map<IEnumerable<UserViewModel>>(userList);
         }
 

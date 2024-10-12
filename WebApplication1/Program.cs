@@ -4,7 +4,9 @@ using System.Text.Json.Serialization;
 using WebApplication1.Models;
 using WebApplication1.Profiles;
 using WebApplication1.Repositories;
+using WebApplication1.Repositories.Interfaces;
 using WebApplication1.Services;
+using WebApplication1.Services.Interfaces;
 
 namespace WebApplication1
 {
@@ -33,12 +35,19 @@ namespace WebApplication1
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // services
             builder.Services.AddTransient<IUserService, UserService>();
+            builder.Services.AddTransient<IRoleService, RoleService>();
+
+            // repositories
+            builder.Services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddTransient<IUserRepository, UserRepository>();
+            builder.Services.AddTransient<IRoleRepository, RoleRepository>();
 
             builder.Services.AddSingleton(new MapperConfiguration(configuration =>
             {
                 configuration.AddProfile(new UserProfile());
+                configuration.AddProfile(new RoleProfile());
             }).CreateMapper());
 
             builder.Services.AddDbContext<IAppDbContext, AppDbContext>(options =>

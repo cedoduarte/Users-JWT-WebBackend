@@ -6,17 +6,17 @@ namespace WebApplication1.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UserController : Controller
+    public class RoleController : Controller
     {
-        private readonly IUserService _userService;
+        private readonly IRoleService _roleService;
 
-        public UserController(IUserService userService)
+        public RoleController(IRoleService roleService)
         {
-            _userService = userService;
+            _roleService = roleService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateUserDto createUserDto, CancellationToken cancel)
+        public async Task<IActionResult> Create([FromBody] CreateRoleDto createRoleDto, CancellationToken cancel)
         {
             if (!ModelState.IsValid)
             {
@@ -24,7 +24,7 @@ namespace WebApplication1.Controllers
             }
             try
             {
-                return Ok(await _userService.CreateAsync(createUserDto, cancel));
+                return Ok(await _roleService.CreateAsync(createRoleDto, cancel));
             }
             catch (Exception ex)
             {
@@ -37,7 +37,7 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                return Ok(await _userService.FindAllAsync(cancel));
+                return Ok(await _roleService.FindAllAsync(cancel));
             }
             catch (Exception ex)
             {
@@ -50,7 +50,7 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                return Ok(await _userService.FindOneAsync(id, cancel));
+                return Ok(await _roleService.FindOneAsync(id, cancel));
             }
             catch (Exception ex)
             {
@@ -59,7 +59,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateUserDto updateUserDto, CancellationToken cancel)
+        public async Task<IActionResult> Update([FromBody] UpdateRoleDto updateRoleDto, CancellationToken cancel)
         {
             if (!ModelState.IsValid)
             {
@@ -67,11 +67,11 @@ namespace WebApplication1.Controllers
             }
             try
             {
-                return Ok(await _userService.UpdateAsync(updateUserDto, cancel));
+                return Ok(await _roleService.UpdateAsync(updateRoleDto, cancel));
             }
             catch (Exception ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 
@@ -80,11 +80,11 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                return Ok(await _userService.SoftDeleteAsync(id, cancel));
+                return Ok(await _roleService.SoftDeleteAsync(id, cancel));
             }
             catch (Exception ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
     }

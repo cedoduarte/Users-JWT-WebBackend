@@ -6,7 +6,7 @@ using WebApplication1.ViewModels;
 
 namespace WebApplication1.Profiles
 {
-    public class UserProfile :  Profile
+    public class UserProfile : Profile
     {
         public UserProfile()
         {
