@@ -12,11 +12,8 @@ namespace WebApplication1.Models
         public string? Name { get; set; }
 
         public bool IsDeleted { get; set; } = false;
-
         public DateTime? Created { get; set; } = DateTime.UtcNow;
         public DateTime? Updated { get; set; } = DateTime.UtcNow;
         public DateTime? Deleted { get; set; } = DateTime.UtcNow;
-
-        public virtual ICollection<RolePermission> RolePermissions { get; set; } = new HashSet<RolePermission>();
     }
 }

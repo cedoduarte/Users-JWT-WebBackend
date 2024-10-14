@@ -1,14 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WebApplication1.Models;
 using WebApplication1.Repositories.Interfaces;
 
 namespace WebApplication1.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly DbContext _dbContext;
+        private readonly AppDbContext _dbContext;
         private readonly DbSet<T> _dbSet;
 
-        public Repository(DbContext dbContext)
+        public Repository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
             _dbSet = _dbContext.Set<T>();

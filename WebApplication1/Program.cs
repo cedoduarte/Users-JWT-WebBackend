@@ -12,7 +12,7 @@ namespace WebApplication1
 {
     public class Program
     {
-        private const string connectionStringName = "ExampleRolePermissions";
+        private const string connectionStringName = "RolesDB";
 
         public static void Main(string[] args)
         {
@@ -35,19 +35,24 @@ namespace WebApplication1
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // repositories
+            builder.Services.AddTransient<IRepository<User>, Repository<User>>();
+            builder.Services.AddTransient<IRepository<Role>, Repository<Role>>();
+            builder.Services.AddTransient<IRepository<Permission>, Repository<Permission>>();
+            builder.Services.AddTransient<IUserRoleRepository, UserRoleRepository>();
+
             // services
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<IRoleService, RoleService>();
-
-            // repositories
-            builder.Services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
-            builder.Services.AddTransient<IUserRepository, UserRepository>();
-            builder.Services.AddTransient<IRoleRepository, RoleRepository>();
+            builder.Services.AddTransient<IPermissionService, PermissionService>();
+            builder.Services.AddTransient<IUserRoleService, UserRoleService>();
 
             builder.Services.AddSingleton(new MapperConfiguration(configuration =>
             {
                 configuration.AddProfile(new UserProfile());
                 configuration.AddProfile(new RoleProfile());
+                configuration.AddProfile(new PermissionProfile());
+                configuration.AddProfile(new UserRoleProfile());
             }).CreateMapper());
 
             builder.Services.AddDbContext<IAppDbContext, AppDbContext>(options =>

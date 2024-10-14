@@ -30,5 +30,8 @@ namespace WebApplication1.DTOs
         [EmailAddress(ErrorMessage = "Invalid email address format")]
         [StringLength(256, ErrorMessage = "Email cannot be longer than 256 characters")]
         public string? Email { get; set; }
+
+        [Required(ErrorMessage = "Role ID is required")]
+        public int RoleId { get; set; }
     }
 }

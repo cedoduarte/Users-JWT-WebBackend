@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Xml;
 using WebApplication1.DTOs;
 using WebApplication1.Models;
 using WebApplication1.Repositories.Interfaces;
@@ -11,10 +12,10 @@ namespace WebApplication1.Services
     public class RoleService : IRoleService
     {
         private readonly IMapper _mapper;
-        private readonly IRoleRepository _roleRepository;
+        private readonly IRepository<Role> _roleRepository;
         private readonly AppDbContext _dbContext;
 
-        public RoleService(IMapper mapper, IRoleRepository roleRepository, AppDbContext dbContext)
+        public RoleService(IMapper mapper, IRepository<Role> roleRepository, AppDbContext dbContext)
         {
             _mapper = mapper;
             _roleRepository = roleRepository;
@@ -42,6 +43,7 @@ namespace WebApplication1.Services
         {
             var foundRole = await _dbContext.Roles
                 .Where(x => !x.IsDeleted && x.Id == id)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(cancel);
             if (foundRole is null)
             {
@@ -52,7 +54,10 @@ namespace WebApplication1.Services
 
         public async Task<RoleViewModel> UpdateAsync(UpdateRoleDto updateRoleDto, CancellationToken cancel)
         {
-            var foundRole = await _roleRepository.FindOneAsync(updateRoleDto.Id, cancel);
+            var foundRole = await _dbContext.Roles
+                .Where(x => !x.IsDeleted && x.Id == updateRoleDto.Id)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancel);
             if (foundRole is null)
             {
                 throw new Exception($"Role Not Found, ID = {updateRoleDto.Id}");
@@ -65,7 +70,9 @@ namespace WebApplication1.Services
 
         public async Task<RoleViewModel> SoftDeleteAsync(int id, CancellationToken cancel)
         {
-            var foundRole = await _roleRepository.FindOneAsync(id, cancel);
+            var foundRole = await _dbContext.Roles
+                .Where(x => !x.IsDeleted && x.Id == id)
+                .FirstOrDefaultAsync(cancel);
             if (foundRole is null)
             {
                 throw new Exception($"Role Not Found, ID = {id}");

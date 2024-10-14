@@ -24,13 +24,6 @@ namespace WebApplication1.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<RolePermission>()
-                .HasKey(rp => new { rp.RoleId, rp.PermissionId }); // Composite key configuration
-
-            modelBuilder.Entity<UserRole>()
-                .HasKey(ur => new { ur.UserId, ur.RoleId }); // Composite key configuration
-
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(IAppDbContext).Assembly);
         }
     }

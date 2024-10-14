@@ -1,16 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace WebApplication1.Models
 {
     public class RolePermission
     {
+        [Key]
+        public int Id { get; set; }
         public int RoleId { get; set; }
         public int PermissionId { get; set; }
-
-        [ForeignKey(nameof(RoleId))]
         public virtual Role? Role { get; set; }
-
-        [ForeignKey(nameof(PermissionId))]
         public virtual Permission? Permission { get; set; }
     }
 }

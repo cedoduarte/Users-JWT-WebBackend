@@ -11,13 +11,21 @@ namespace WebApplication1.Services
     public class UserService : IUserService
     {
         private readonly IMapper _mapper;
-        private readonly IUserRepository _userRepository;
+        private readonly IRepository<User> _userRepository;
+        private readonly IRepository<Role> _roleRepository;
+        private readonly IUserRoleRepository _userRoleRepository;
         private readonly AppDbContext _dbContext;
 
-        public UserService(IMapper mapper, IUserRepository userRepository, AppDbContext dbContext)
+        public UserService(IMapper mapper, 
+            IRepository<User> userRepository,
+            IRepository<Role> roleRepository,
+            IUserRoleRepository userRoleRepository,
+            AppDbContext dbContext)
         {
             _mapper = mapper;
             _userRepository = userRepository;
+            _roleRepository = roleRepository;
+            _userRoleRepository = userRoleRepository;
             _dbContext = dbContext;
         }
 
@@ -26,6 +34,13 @@ namespace WebApplication1.Services
             var newUser = _mapper.Map<User>(createUserDto);
             newUser.Created = DateTime.UtcNow;
             var createdUser = await _userRepository.CreateAsync(newUser, cancel);
+            var foundRole = await _roleRepository.FindOneAsync(createUserDto.RoleId, cancel);
+            var newUserRole = new UserRole()
+            {
+                UserId = createdUser!.Id,
+                RoleId = foundRole!.Id
+            };
+            await _userRoleRepository.CreateAsync(newUserRole);            
             return _mapper.Map<UserViewModel>(createdUser);
         }
 
@@ -42,6 +57,7 @@ namespace WebApplication1.Services
         {
             var foundUser = await _dbContext.Users
                 .Where(x => !x.IsDeleted && x.Id == id)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(cancel);
             if (foundUser is null)
             {
@@ -52,20 +68,43 @@ namespace WebApplication1.Services
 
         public async Task<UserViewModel> UpdateAsync(UpdateUserDto updateUserDto, CancellationToken cancel)
         {
-            var foundUser = await _userRepository.FindOneAsync(updateUserDto.Id, cancel);
+            var foundUser = await _dbContext.Users
+                .Where(x => !x.IsDeleted && x.Id == updateUserDto.Id)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancel);
             if (foundUser is null)
             {
                 throw new Exception($"User Not Found, ID = {updateUserDto.Id}");
             }
-            var user = _mapper.Map<User>(updateUserDto);
-            user.Updated = DateTime.UtcNow;
-            var updatedUser = await _userRepository.UpdateAsync(user, cancel);
+            var foundRole = await _dbContext.Roles
+                .Where(x => !x.IsDeleted && x.Id == updateUserDto.RoleId)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancel);
+            if (foundRole is null)
+            {
+                throw new Exception($"Role Not Found, ID = {updateUserDto.RoleId}");
+            }
+            var foundUserRole = await _dbContext.UserRoles
+                .Where(x => x.UserId == foundUser.Id)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancel);
+            if (foundUserRole is null)
+            {
+                throw new Exception($"Role Not Found, ID = {updateUserDto.RoleId}");
+            }
+            foundUser = _mapper.Map<User>(updateUserDto);
+            foundUser.Updated = DateTime.UtcNow;
+            var updatedUser = await _userRepository.UpdateAsync(foundUser, cancel);
+            foundUserRole.RoleId = updateUserDto.RoleId;
+            await _userRoleRepository.UpdateAsync(foundUserRole, cancel);
             return _mapper.Map<UserViewModel>(updatedUser);
         }
 
         public async Task<UserViewModel> SoftDeleteAsync(int id, CancellationToken cancel)
         {
-            var foundUser = await _userRepository.FindOneAsync(id, cancel);
+            var foundUser = await _dbContext.Users
+                .Where(x => !x.IsDeleted && x.Id == id)
+                .FirstOrDefaultAsync(cancel);
             if (foundUser is null)
             {
                 throw new Exception($"User Not Found, ID = {id}");
