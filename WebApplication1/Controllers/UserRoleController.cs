@@ -15,23 +15,6 @@ namespace WebApplication1.Controllers
             _userRoleService = userRoleService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateUserRoleDto createUserRoleDto, CancellationToken cancel)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            try
-            {
-                return Ok(await _userRoleService.CreateAsync(createUserRoleDto, cancel));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
         [HttpGet]
         public async Task<IActionResult> FindAll(CancellationToken cancel)
         {
@@ -68,19 +51,6 @@ namespace WebApplication1.Controllers
             try
             {
                 return Ok(await _userRoleService.UpdateAsync(updateUserRoleDto, cancel));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpDelete("{userId}")]
-        public async Task<IActionResult> Remove([FromRoute] int userId, CancellationToken cancel)
-        {
-            try
-            {
-                return Ok(await _userRoleService.DeleteAsync(userId, cancel));
             }
             catch (Exception ex)
             {

@@ -112,6 +112,7 @@ namespace WebApplication1.Services
             foundUser.IsDeleted = true;
             foundUser.Deleted = DateTime.UtcNow;
             var updatedUser = await _userRepository.UpdateAsync(foundUser, cancel);
+            await _userRoleRepository.RemoveByUserIdAsync(foundUser.Id);
             return _mapper.Map<UserViewModel>(updatedUser);
         }
 

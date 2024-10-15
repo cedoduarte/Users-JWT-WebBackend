@@ -21,34 +21,6 @@ namespace WebApplication1.Services
             _userRoleRepository = userRoleRepository;
         }
 
-        public async Task<UserRoleViewModel> CreateAsync(CreateUserRoleDto createUserRoleDto, CancellationToken cancel)
-        {
-            var foundUser = _dbContext.Users
-                .Where(x => !x.IsDeleted && x.Id == createUserRoleDto.UserId)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(cancel);
-            if (foundUser is null)
-            {
-                throw new Exception($"User Not Found, ID = {createUserRoleDto.UserId}");
-            }
-            var foundRole = _dbContext.Roles
-                .Where(x => !x.IsDeleted && x.Id == createUserRoleDto.RoleId)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(cancel);
-            if (foundRole is null)
-            {
-                throw new Exception($"Role Not Found, ID = {createUserRoleDto.RoleId}");
-            }
-            var newUserRole = _mapper.Map<UserRole>(createUserRoleDto);
-            await _userRoleRepository.CreateAsync(newUserRole, cancel);
-            var userRoleViewModel = new UserRoleViewModel()
-            {
-                User = _mapper.Map<UserViewModel>(foundUser),
-                Role = _mapper.Map<RoleViewModel>(foundRole)
-            };
-            return userRoleViewModel;
-        }
-
         public async Task<IEnumerable<UserRoleViewModel>> FindAllAsync(CancellationToken cancel)
         {
             var userRoleList = await _dbContext.UserRoles
@@ -83,7 +55,7 @@ namespace WebApplication1.Services
 
         public async Task<UserRoleViewModel?> FindOneByUserIdAsync(int userId, CancellationToken cancel)
         {
-            var foundUser = _dbContext.Users
+            var foundUser = await _dbContext.Users
                 .Where(x => !x.IsDeleted && x.Id == userId)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancel);
@@ -117,7 +89,7 @@ namespace WebApplication1.Services
 
         public async Task<UserRoleViewModel> UpdateAsync(UpdateUserRoleDto updateUserRoleDto, CancellationToken cancel)
         {
-            var foundUser = _dbContext.Users
+            var foundUser = await _dbContext.Users
                 .Where(x => !x.IsDeleted && x.Id == updateUserRoleDto.UserId)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancel);
@@ -125,7 +97,7 @@ namespace WebApplication1.Services
             {
                 throw new Exception($"User Not Found, ID = {updateUserRoleDto.UserId}");
             }
-            var foundRole = _dbContext.Roles
+            var foundRole = await _dbContext.Roles
                 .Where(x => !x.IsDeleted && x.Id == updateUserRoleDto.RoleId)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancel);
@@ -149,17 +121,6 @@ namespace WebApplication1.Services
                 Role = _mapper.Map<RoleViewModel>(foundRole)
             };
             return userRoleViewModel;
-        }
-
-        public async Task<bool> DeleteAsync(int userId, CancellationToken cancel)
-        {
-            var foundUserRole = await _userRoleRepository.FindOneByUserIdAsync(userId, cancel);
-            if (foundUserRole is null)
-            {
-                throw new Exception($"User-Role Not Found, User ID = {userId}");
-            }
-            await _userRoleRepository.RemoveByUserIdAsync(userId, cancel);
-            return true;
         }
     }
 }
