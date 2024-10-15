@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using WebApplication1.Models;
+using WebApplication1.Models.Interfaces;
 using WebApplication1.Profiles;
 using WebApplication1.Repositories;
 using WebApplication1.Repositories.Interfaces;
@@ -40,13 +41,15 @@ namespace WebApplication1
             builder.Services.AddTransient<IRepository<Role>, Repository<Role>>();
             builder.Services.AddTransient<IRepository<Permission>, Repository<Permission>>();
             builder.Services.AddTransient<IUserRoleRepository, UserRoleRepository>();
-            builder.Services.AddTransient<IRolePermissionRepository, RolePermissionRepository>();
+            builder.Services.AddTransient<IRepository<RolePermission>, Repository<RolePermission>>();
+            builder.Services.AddTransient<IRepository<Authentication>, Repository<Authentication>>();
 
             // services
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<IRoleService, RoleService>();
             builder.Services.AddTransient<IPermissionService, PermissionService>();
             builder.Services.AddTransient<IUserRoleService, UserRoleService>();
+            builder.Services.AddTransient<IRolePermissionService, RolePermissionService>();
 
             builder.Services.AddSingleton(new MapperConfiguration(configuration =>
             {
@@ -54,6 +57,8 @@ namespace WebApplication1
                 configuration.AddProfile(new RoleProfile());
                 configuration.AddProfile(new PermissionProfile());
                 configuration.AddProfile(new UserRoleProfile());
+                configuration.AddProfile(new RolePermissionProfile());
+                configuration.AddProfile(new AuthenticationProfile());
             }).CreateMapper());
 
             builder.Services.AddDbContext<IAppDbContext, AppDbContext>(options =>

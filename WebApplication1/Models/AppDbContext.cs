@@ -1,16 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WebApplication1.Models.Interfaces;
 
 namespace WebApplication1.Models
 {
-    public interface IAppDbContext
-    {
-        DbSet<Permission> Permissions { get; set; }
-        DbSet<Role> Roles { get; set; }
-        DbSet<RolePermission> RolePermissions { get; set; }
-        DbSet<User> Users { get; set; }
-        DbSet<UserRole> UserRoles { get; set; }
-    }
-
     public class AppDbContext : DbContext, IAppDbContext
     {
         public DbSet<Permission> Permissions { get; set; }
@@ -18,6 +10,7 @@ namespace WebApplication1.Models
         public DbSet<RolePermission> RolePermissions { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<Authentication> Authentications { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 

@@ -9,10 +9,12 @@ namespace WebApplication1.Controllers
     [Route("[controller]")]
     public class UserController : Controller
     {
+        private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
 
-        public UserController(IUserService userService)
+        public UserController(ILogger<UserController> logger, IUserService userService)
         {
+            _logger = logger;
             _userService = userService;
         }
 
@@ -21,6 +23,7 @@ namespace WebApplication1.Controllers
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("CreateUserDto has validation errors");
                 return BadRequest(ModelState);
             }
             try
@@ -29,6 +32,7 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError($"An error has occurred: {ex.Message}");
                 return BadRequest(ex.Message);
             }
         }
@@ -42,6 +46,7 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError($"An error has occurred: {ex.Message}");
                 return BadRequest(ex.Message);
             }
         }
@@ -55,11 +60,13 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
+                _logger.LogWarning($"Resource has not been found: {ex.Message}");
                 return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
-                return NotFound(ex.Message);
+                _logger.LogError($"An error has occurred: {ex.Message}");
+                return BadRequest(ex.Message);
             }
         }
 
@@ -68,6 +75,7 @@ namespace WebApplication1.Controllers
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("UpdateUserDto has validation errors");
                 return BadRequest(ModelState);
             }
             try
@@ -76,10 +84,12 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
+                _logger.LogWarning($"Resource has not been found: {ex.Message}");
                 return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
+                _logger.LogError($"An error has occurred: {ex.Message}");
                 return BadRequest(ex.Message);
             }
         }
@@ -93,10 +103,12 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
+                _logger.LogWarning($"Resource has not been found: {ex.Message}");
                 return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
+                _logger.LogError($"An error has occurred: {ex.Message}");
                 return BadRequest(ex.Message);
             }
         }

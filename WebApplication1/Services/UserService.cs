@@ -113,7 +113,7 @@ namespace WebApplication1.Services
             foundUser.IsDeleted = true;
             foundUser.Deleted = DateTime.UtcNow;
             var updatedUser = await _userRepository.UpdateAsync(foundUser, cancel);
-            await _userRoleRepository.RemoveByUserIdAsync(foundUser.Id);
+            await _userRoleRepository.RemoveByUserIdAsync(foundUser.Id, cancel);
             return _mapper.Map<UserViewModel>(updatedUser);
         }
 
@@ -125,6 +125,7 @@ namespace WebApplication1.Services
                 throw new NotFoundException($"User Not Found, ID = {id}");
             }
             var removedUser = await _userRepository.RemoveAsync(id, cancel);
+            await _userRoleRepository.RemoveByUserIdAsync(foundUser.Id, cancel);
             return _mapper.Map<UserViewModel>(removedUser);
         }
     }
