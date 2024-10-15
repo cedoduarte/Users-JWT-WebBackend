@@ -40,6 +40,7 @@ namespace WebApplication1
             builder.Services.AddTransient<IRepository<Role>, Repository<Role>>();
             builder.Services.AddTransient<IRepository<Permission>, Repository<Permission>>();
             builder.Services.AddTransient<IUserRoleRepository, UserRoleRepository>();
+            builder.Services.AddTransient<IRolePermissionRepository, RolePermissionRepository>();
 
             // services
             builder.Services.AddTransient<IUserService, UserService>();

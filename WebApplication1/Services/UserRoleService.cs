@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.DTOs;
+using WebApplication1.Exceptions;
 using WebApplication1.Models;
 using WebApplication1.Repositories.Interfaces;
 using WebApplication1.Services.Interfaces;
@@ -61,7 +62,7 @@ namespace WebApplication1.Services
                 .FirstOrDefaultAsync(cancel);
             if (foundUser is null)
             {
-                throw new Exception($"User Not Found, ID = {userId}");
+                throw new NotFoundException($"User Not Found, ID = {userId}");
             }
             var foundUserRole = await _dbContext.UserRoles
                 .Where(x => x.UserId == userId)
@@ -75,7 +76,7 @@ namespace WebApplication1.Services
                     .FirstOrDefaultAsync(cancel);
                 if (foundRole is null)
                 {
-                    throw new Exception($"Role Not Found, ID = {foundUserRole.RoleId}");
+                    throw new NotFoundException($"Role Not Found, ID = {foundUserRole.RoleId}");
                 }
                 var userRoleViewModel = new UserRoleViewModel()
                 {
@@ -95,7 +96,7 @@ namespace WebApplication1.Services
                 .FirstOrDefaultAsync(cancel);
             if (foundUser is null)
             {
-                throw new Exception($"User Not Found, ID = {updateUserRoleDto.UserId}");
+                throw new NotFoundException($"User Not Found, ID = {updateUserRoleDto.UserId}");
             }
             var foundRole = await _dbContext.Roles
                 .Where(x => !x.IsDeleted && x.Id == updateUserRoleDto.RoleId)
@@ -103,14 +104,14 @@ namespace WebApplication1.Services
                 .FirstOrDefaultAsync(cancel);
             if (foundRole is null)
             {
-                throw new Exception($"Role Not Found, ID = {updateUserRoleDto.RoleId}");
+                throw new NotFoundException($"Role Not Found, ID = {updateUserRoleDto.RoleId}");
             }
             var foundUserRole = await _dbContext.UserRoles
                 .Where(x => x.UserId == updateUserRoleDto.UserId)
                 .FirstOrDefaultAsync(cancel);
             if (foundUserRole is null)
             {
-                throw new Exception($"User-Role Not Found, User ID = {updateUserRoleDto.UserId}");
+                throw new NotFoundException($"User-Role Not Found, User ID = {updateUserRoleDto.UserId}");
             }
             foundUserRole.UserId = updateUserRoleDto.UserId;
             foundUserRole.RoleId = updateUserRoleDto.RoleId;

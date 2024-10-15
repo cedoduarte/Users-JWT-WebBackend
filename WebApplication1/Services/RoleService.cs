@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Xml;
 using WebApplication1.DTOs;
+using WebApplication1.Exceptions;
 using WebApplication1.Models;
 using WebApplication1.Repositories.Interfaces;
 using WebApplication1.Services.Interfaces;
@@ -47,7 +48,7 @@ namespace WebApplication1.Services
                 .FirstOrDefaultAsync(cancel);
             if (foundRole is null)
             {
-                throw new Exception($"Role Not Found, ID = {id}");
+                throw new NotFoundException($"Role Not Found, ID = {id}");
             }
             return _mapper.Map<RoleViewModel>(foundRole);
         }
@@ -60,7 +61,7 @@ namespace WebApplication1.Services
                 .FirstOrDefaultAsync(cancel);
             if (foundRole is null)
             {
-                throw new Exception($"Role Not Found, ID = {updateRoleDto.Id}");
+                throw new NotFoundException($"Role Not Found, ID = {updateRoleDto.Id}");
             }
             var role = _mapper.Map<Role>(updateRoleDto);
             role.Updated = DateTime.UtcNow;
@@ -75,7 +76,7 @@ namespace WebApplication1.Services
                 .FirstOrDefaultAsync(cancel);
             if (foundRole is null)
             {
-                throw new Exception($"Role Not Found, ID = {id}");
+                throw new NotFoundException($"Role Not Found, ID = {id}");
             }
             foundRole.IsDeleted = true;
             foundRole.Deleted = DateTime.UtcNow;
@@ -88,7 +89,7 @@ namespace WebApplication1.Services
             var foundRole = await _roleRepository.FindOneAsync(id, cancel);
             if (foundRole is null)
             {
-                throw new Exception($"Role Not Found, ID = {id}");
+                throw new NotFoundException($"Role Not Found, ID = {id}");
             }
             var removedRole = await _roleRepository.RemoveAsync(id, cancel);
             return _mapper.Map<RoleViewModel>(removedRole);

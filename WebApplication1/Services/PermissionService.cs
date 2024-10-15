@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.DTOs;
+using WebApplication1.Exceptions;
 using WebApplication1.Models;
 using WebApplication1.Repositories.Interfaces;
 using WebApplication1.Services.Interfaces;
@@ -46,7 +47,7 @@ namespace WebApplication1.Services
                 .FirstOrDefaultAsync(cancel);
             if (foundPermission is null)
             {
-                throw new Exception($"Permission Not Found, ID = {id}");
+                throw new NotFoundException($"Permission Not Found, ID = {id}");
             }
             return _mapper.Map<PermissionViewModel>(foundPermission);
         }
@@ -59,7 +60,7 @@ namespace WebApplication1.Services
                 .FirstOrDefaultAsync(cancel);
             if (foundPermission is null)
             {
-                throw new Exception($"Permission Not Found, ID = {updatePermissionDto.Id}");
+                throw new NotFoundException($"Permission Not Found, ID = {updatePermissionDto.Id}");
             }
             var permission = _mapper.Map<Permission>(updatePermissionDto);
             permission.Updated = DateTime.UtcNow;
@@ -74,7 +75,7 @@ namespace WebApplication1.Services
                 .FirstOrDefaultAsync(cancel);
             if (foundPermission is null)
             {
-                throw new Exception($"Permission Not Found, ID = {id}");
+                throw new NotFoundException($"Permission Not Found, ID = {id}");
             }
             foundPermission.IsDeleted = true;
             foundPermission.Deleted = DateTime.UtcNow;
@@ -87,7 +88,7 @@ namespace WebApplication1.Services
             var foundPermission = await _permissionRepository.FindOneAsync(id, cancel);
             if (foundPermission is null)
             {
-                throw new Exception($"Permission Not Found, {id}");
+                throw new NotFoundException($"Permission Not Found, {id}");
             }
             var removedPermission = await _permissionRepository.RemoveAsync(id, cancel);
             return _mapper.Map<PermissionViewModel>(removedPermission);

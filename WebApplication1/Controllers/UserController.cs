@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApplication1.DTOs;
+using WebApplication1.Exceptions;
 using WebApplication1.Services.Interfaces;
 
 namespace WebApplication1.Controllers
@@ -52,6 +53,10 @@ namespace WebApplication1.Controllers
             {
                 return Ok(await _userService.FindOneAsync(id, cancel));
             }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
             catch (Exception ex)
             {
                 return NotFound(ex.Message);
@@ -69,9 +74,13 @@ namespace WebApplication1.Controllers
             {
                 return Ok(await _userService.UpdateAsync(updateUserDto, cancel));
             }
-            catch (Exception ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
@@ -82,9 +91,13 @@ namespace WebApplication1.Controllers
             {
                 return Ok(await _userService.SoftDeleteAsync(id, cancel));
             }
-            catch (Exception ex)
+            catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }

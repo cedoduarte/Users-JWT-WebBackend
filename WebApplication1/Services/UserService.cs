@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.DTOs;
+using WebApplication1.Exceptions;
 using WebApplication1.Models;
 using WebApplication1.Repositories.Interfaces;
 using WebApplication1.Services.Interfaces;
@@ -61,7 +62,7 @@ namespace WebApplication1.Services
                 .FirstOrDefaultAsync(cancel);
             if (foundUser is null)
             {
-                throw new Exception($"User Not Found, ID = {id}");
+                throw new NotFoundException($"User Not Found, ID = {id}");
             }
             return _mapper.Map<UserViewModel>(foundUser);
         }
@@ -74,7 +75,7 @@ namespace WebApplication1.Services
                 .FirstOrDefaultAsync(cancel);
             if (foundUser is null)
             {
-                throw new Exception($"User Not Found, ID = {updateUserDto.Id}");
+                throw new NotFoundException($"User Not Found, ID = {updateUserDto.Id}");
             }
             var foundRole = await _dbContext.Roles
                 .Where(x => !x.IsDeleted && x.Id == updateUserDto.RoleId)
@@ -82,7 +83,7 @@ namespace WebApplication1.Services
                 .FirstOrDefaultAsync(cancel);
             if (foundRole is null)
             {
-                throw new Exception($"Role Not Found, ID = {updateUserDto.RoleId}");
+                throw new NotFoundException($"Role Not Found, ID = {updateUserDto.RoleId}");
             }
             var foundUserRole = await _dbContext.UserRoles
                 .Where(x => x.UserId == foundUser.Id)
@@ -90,7 +91,7 @@ namespace WebApplication1.Services
                 .FirstOrDefaultAsync(cancel);
             if (foundUserRole is null)
             {
-                throw new Exception($"Role Not Found, ID = {updateUserDto.RoleId}");
+                throw new NotFoundException($"Role Not Found, ID = {updateUserDto.RoleId}");
             }
             foundUser = _mapper.Map<User>(updateUserDto);
             foundUser.Updated = DateTime.UtcNow;
@@ -107,7 +108,7 @@ namespace WebApplication1.Services
                 .FirstOrDefaultAsync(cancel);
             if (foundUser is null)
             {
-                throw new Exception($"User Not Found, ID = {id}");
+                throw new NotFoundException($"User Not Found, ID = {id}");
             }
             foundUser.IsDeleted = true;
             foundUser.Deleted = DateTime.UtcNow;
@@ -121,7 +122,7 @@ namespace WebApplication1.Services
             var foundUser = await _userRepository.FindOneAsync(id, cancel);
             if (foundUser is null)
             {
-                throw new Exception($"User Not Found, ID = {id}");
+                throw new NotFoundException($"User Not Found, ID = {id}");
             }
             var removedUser = await _userRepository.RemoveAsync(id, cancel);
             return _mapper.Map<UserViewModel>(removedUser);
