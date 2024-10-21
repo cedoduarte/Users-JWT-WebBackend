@@ -23,7 +23,7 @@ namespace WebApplication1.Controllers
         {
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("CreateUserDto has validation errors");
+                _logger.LogWarning($"CreateUserDto has validation errors: {ModelState}");
                 return BadRequest(ModelState);
             }
             try
@@ -32,8 +32,8 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error has occurred: {ex.Message}");
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
@@ -46,8 +46,8 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error has occurred: {ex.Message}");
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
@@ -60,13 +60,13 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
-                _logger.LogWarning($"Resource has not been found: {ex.Message}");
-                return NotFound(ex.Message);
+                _logger.LogWarning($"User with ID {id} Not Found, Message: {ex.Message}");
+                return NotFound($"User with ID {id} Not Found");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error has occurred: {ex.Message}");
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
@@ -75,7 +75,7 @@ namespace WebApplication1.Controllers
         {
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("UpdateUserDto has validation errors");
+                _logger.LogWarning($"UpdateUserDto has validation errors: {ModelState}");
                 return BadRequest(ModelState);
             }
             try
@@ -84,13 +84,13 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
-                _logger.LogWarning($"Resource has not been found: {ex.Message}");
-                return NotFound(ex.Message);
+                _logger.LogWarning($"User with username '{updateUserDto.Username}' Not Found, Message: {ex.Message}");
+                return NotFound($"User with username '{updateUserDto.Username}' Not Found");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error has occurred: {ex.Message}");
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
@@ -103,13 +103,13 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
-                _logger.LogWarning($"Resource has not been found: {ex.Message}");
-                return NotFound(ex.Message);
+                _logger.LogWarning($"User with ID {id} Not Found, Message: {ex.Message}");
+                return NotFound($"User with ID {id} Not Found");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error has occurred: {ex.Message}");
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexptected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
     }

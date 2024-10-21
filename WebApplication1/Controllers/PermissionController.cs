@@ -9,10 +9,12 @@ namespace WebApplication1.Controllers
     [Route("[controller]")]
     public class PermissionController : Controller
     {
+        private readonly ILogger<PermissionController> _logger;
         private readonly IPermissionService _permissionService;
 
-        public PermissionController(IPermissionService permissionService)
+        public PermissionController(ILogger<PermissionController> logger, IPermissionService permissionService)
         {
+            _logger = logger;
             _permissionService = permissionService;
         }
 
@@ -21,6 +23,7 @@ namespace WebApplication1.Controllers
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning($"CreatePermissionDto has validation errors: {ModelState}");
                 return BadRequest(ModelState);
             }
             try
@@ -29,7 +32,8 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
@@ -42,7 +46,8 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
@@ -55,28 +60,37 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                _logger.LogWarning($"Permission with ID {id} Not Found, Message: {ex.Message}");
+                return NotFound($"Permission with ID {id} Not Found");
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UpdatePermissionDto updatePermissionDto, CancellationToken cancel)
         {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning($"UpdatePermissionDto has validation errors: {ModelState}");
+                return BadRequest(ModelState);
+            }
             try
             {
                 return Ok(await _permissionService.UpdateAsync(updatePermissionDto, cancel));
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                _logger.LogWarning($"Permission with name '{updatePermissionDto.Name}' Not Found, Message: {ex.Message}");
+                return NotFound($"Permission with name '{updatePermissionDto.Name}' Not Found");
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
@@ -89,11 +103,13 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                _logger.LogWarning($"Permission with ID {id} Not Found, Message: {ex.Message}");
+                return NotFound($"Permission with ID {id} Not Found");
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
     }

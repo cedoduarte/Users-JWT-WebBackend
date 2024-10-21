@@ -9,10 +9,12 @@ namespace WebApplication1.Controllers
     [Route("[controller]")]
     public class RoleController : Controller
     {
+        private readonly ILogger<RoleController> _logger;
         private readonly IRoleService _roleService;
 
-        public RoleController(IRoleService roleService)
+        public RoleController(ILogger<RoleController> logger, IRoleService roleService)
         {
+            _logger = logger;
             _roleService = roleService;
         }
 
@@ -21,6 +23,7 @@ namespace WebApplication1.Controllers
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning($"CreateRoleDto has validation errors: {ModelState}");
                 return BadRequest(ModelState);
             }
             try
@@ -29,7 +32,8 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
@@ -42,7 +46,8 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
@@ -55,11 +60,13 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                _logger.LogWarning($"Role with ID {id} Not Found, Message: {ex.Message}");
+                return NotFound($"Role with ID {id} Not Found");
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
@@ -68,6 +75,7 @@ namespace WebApplication1.Controllers
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning($"UpdateRoleDto has validation errors: {ModelState}");
                 return BadRequest(ModelState);
             }
             try
@@ -76,11 +84,13 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                _logger.LogWarning($"Role with name '{updateRoleDto.Name}' Not Found, Message: {ex.Message}");
+                return NotFound($"Role with name '{updateRoleDto.Name}' Not Found");
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
@@ -93,11 +103,13 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                _logger.LogWarning($"Role with ID {id} Not Found, Message: {ex.Message}");
+                return NotFound($"Role with ID {id} Not Found");
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
     }

@@ -50,6 +50,7 @@ namespace WebApplication1
             builder.Services.AddTransient<IPermissionService, PermissionService>();
             builder.Services.AddTransient<IUserRoleService, UserRoleService>();
             builder.Services.AddTransient<IRolePermissionService, RolePermissionService>();
+            builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
 
             builder.Services.AddSingleton(new MapperConfiguration(configuration =>
             {

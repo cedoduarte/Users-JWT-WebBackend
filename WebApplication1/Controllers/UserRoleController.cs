@@ -9,10 +9,12 @@ namespace WebApplication1.Controllers
     [Route("[controller]")]
     public class UserRoleController : Controller
     {
+        private readonly ILogger<UserRoleController> _logger;
         private readonly IUserRoleService _userRoleService;
 
-        public UserRoleController(IUserRoleService userRoleService)
+        public UserRoleController(ILogger<UserRoleController> logger, IUserRoleService userRoleService)
         {
+            _logger = logger;
             _userRoleService = userRoleService;
         }
 
@@ -25,7 +27,8 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
@@ -38,11 +41,13 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                _logger.LogWarning($"User with ID {userId} or Role Not Found, Message: {ex.Message}");
+                return NotFound($"User with ID {userId} or Role Not Found");
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
@@ -51,6 +56,7 @@ namespace WebApplication1.Controllers
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning($"UpdateUserRoleDto has validation errors: {ModelState}");
                 return BadRequest(ModelState);
             }
             try
@@ -59,11 +65,13 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                _logger.LogWarning($"User with ID {updateUserRoleDto.UserId} Not Found, Message: {ex.Message}");
+                return NotFound($"User with ID {updateUserRoleDto.UserId} Not Found");
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
     }

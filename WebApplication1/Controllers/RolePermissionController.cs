@@ -9,10 +9,12 @@ namespace WebApplication1.Controllers
     [Route("[controller]")]
     public class RolePermissionController : Controller
     {
+        private readonly ILogger<RolePermissionController> _logger;
         private readonly IRolePermissionService _rolePermissionService;
 
-        public RolePermissionController(IRolePermissionService rolePermissionService)
+        public RolePermissionController(ILogger<RolePermissionController> logger, IRolePermissionService rolePermissionService)
         {
+            _logger = logger;
             _rolePermissionService = rolePermissionService;
         }
 
@@ -21,6 +23,7 @@ namespace WebApplication1.Controllers
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning($"CreateRolePermissionDto has validation errors: {ModelState}");
                 return BadRequest(ModelState);
             }
             try
@@ -29,7 +32,8 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
@@ -42,7 +46,8 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
 
@@ -55,11 +60,13 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                _logger.LogWarning($"Role or Permission Not Found, Message: {ex.Message}");
+                return NotFound($"Role with ID {roleId} or Permission with Id {permissionId} Not Found");
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred. Please try again later.");
             }
         }
     }

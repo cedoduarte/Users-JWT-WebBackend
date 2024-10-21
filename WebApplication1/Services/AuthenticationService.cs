@@ -27,7 +27,8 @@ namespace WebApplication1.Services
         {
             string passwordHash = Util.GetSha256Hash(authenticateDto.Password!);
             var foundUser = await _dbContext.Users
-                .Where(x => string.Equals(x.Username, authenticateDto.Username) && string.Equals(x.PasswordHash, passwordHash))
+                .Where(x => string.Equals(x.Username, authenticateDto.Username) 
+                         && string.Equals(x.PasswordHash, passwordHash))
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancel);
             if (foundUser is null)
@@ -40,7 +41,6 @@ namespace WebApplication1.Services
                 Date = DateTime.UtcNow
             };
             var createdAuthentication = await _authenticationRepository.CreateAsync(newAuthentication, cancel);
-            // todo... hacer el controller
             // todo... falta ver si createdAuthentication viene full desde ahorita o talvez hace falta hacer un query con include full
             return _mapper.Map<AuthenticationViewModel>(createdAuthentication);
         }
