@@ -19,7 +19,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Authenticate(AuthenticateDto authenticateDto, CancellationToken cancel)
+        public async Task<IActionResult> Authenticate([FromBody] AuthenticateDto authenticateDto, CancellationToken cancel)
         {
             if (!ModelState.IsValid)
             {
