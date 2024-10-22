@@ -32,6 +32,6 @@ namespace WebApplication1.DTOs
         public string? Email { get; set; }
 
         [Required(ErrorMessage = "Role ID is required")]
-        public int RoleId { get; set; }
+        public int? RoleId { get; set; }
     }
 }

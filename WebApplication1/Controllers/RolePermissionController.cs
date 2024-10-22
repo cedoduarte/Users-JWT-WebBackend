@@ -30,6 +30,11 @@ namespace WebApplication1.Controllers
             {
                 return Ok(await _rolePermissionService.CreateAsync(createRolePermissionDto, cancel));
             }
+            catch (NotFoundException ex)
+            {
+                _logger.LogWarning($"Role with ID {createRolePermissionDto.RoleId} or Permission with ID {createRolePermissionDto.PermissionId} Not Found, Message: {ex.Message}");
+                return NotFound(ex.Message);
+            }
             catch (Exception ex)
             {
                 _logger.LogError($"An unexpected error occurred: {ex.Message}");

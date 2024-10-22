@@ -5,6 +5,6 @@ namespace WebApplication1.DTOs
     public class UpdatePermissionDto : CreatePermissionDto
     {
         [Required]
-        public int Id { get; set; }
+        public int? Id { get; set; }
     }
 }

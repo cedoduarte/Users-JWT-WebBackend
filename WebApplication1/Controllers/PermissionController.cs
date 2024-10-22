@@ -84,8 +84,8 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
-                _logger.LogWarning($"Permission with name '{updatePermissionDto.Name}' Not Found, Message: {ex.Message}");
-                return NotFound($"Permission with name '{updatePermissionDto.Name}' Not Found");
+                _logger.LogWarning($"Permission with ID '{updatePermissionDto.Id}' Not Found, Message: {ex.Message}");
+                return NotFound($"Permission with ID '{updatePermissionDto.Id}' Not Found");
             }
             catch (Exception ex)
             {

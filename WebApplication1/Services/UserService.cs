@@ -32,10 +32,14 @@ namespace WebApplication1.Services
 
         public async Task<UserViewModel> CreateAsync(CreateUserDto createUserDto, CancellationToken cancel)
         {
+            var foundRole = await _roleRepository.FindOneAsync(createUserDto.RoleId ?? 0, cancel);
+            if (foundRole is null)
+            {
+                throw new NotFoundException($"Role Not Found, ID = {createUserDto.RoleId}");
+            }
             var newUser = _mapper.Map<User>(createUserDto);
             newUser.Created = DateTime.UtcNow;
             var createdUser = await _userRepository.CreateAsync(newUser, cancel);
-            var foundRole = await _roleRepository.FindOneAsync(createUserDto.RoleId, cancel);
             var newUserRole = new UserRole()
             {
                 UserId = createdUser!.Id,
@@ -91,12 +95,12 @@ namespace WebApplication1.Services
                 .FirstOrDefaultAsync(cancel);
             if (foundUserRole is null)
             {
-                throw new NotFoundException($"Role Not Found, ID = {updateUserDto.RoleId}");
+                throw new NotFoundException($"User-Role Not Found for User with ID = {updateUserDto.RoleId}");
             }
             foundUser = _mapper.Map<User>(updateUserDto);
             foundUser.Updated = DateTime.UtcNow;
             var updatedUser = await _userRepository.UpdateAsync(foundUser, cancel);
-            foundUserRole.RoleId = updateUserDto.RoleId;
+            foundUserRole.RoleId = updateUserDto.RoleId ?? 0;
             await _userRoleRepository.UpdateAsync(foundUserRole, cancel);
             return _mapper.Map<UserViewModel>(updatedUser);
         }

@@ -113,8 +113,8 @@ namespace WebApplication1.Services
             {
                 throw new NotFoundException($"User-Role Not Found, User ID = {updateUserRoleDto.UserId}");
             }
-            foundUserRole.UserId = updateUserRoleDto.UserId;
-            foundUserRole.RoleId = updateUserRoleDto.RoleId;
+            foundUserRole.UserId = updateUserRoleDto.UserId ?? 0;
+            foundUserRole.RoleId = updateUserRoleDto.RoleId ?? 0;
             var updatedUserRole = await _userRoleRepository.UpdateAsync(foundUserRole, cancel);
             var userRoleViewModel = new UserRoleViewModel()
             {

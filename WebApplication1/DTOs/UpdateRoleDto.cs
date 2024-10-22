@@ -5,6 +5,6 @@ namespace WebApplication1.DTOs
     public class UpdateRoleDto : CreateRoleDto
     {
         [Required]
-        public int Id { get; set; }
+        public int? Id { get; set; }
     }
 }

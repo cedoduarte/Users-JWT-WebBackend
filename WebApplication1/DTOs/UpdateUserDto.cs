@@ -7,6 +7,6 @@ namespace WebApplication1.DTOs
     public class UpdateUserDto : CreateUserDto
     {
         [Required]
-        public int Id { get; set; }
+        public int? Id { get; set; }
     }
 }

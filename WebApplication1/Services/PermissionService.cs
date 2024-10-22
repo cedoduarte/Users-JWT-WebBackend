@@ -88,7 +88,7 @@ namespace WebApplication1.Services
             var foundPermission = await _permissionRepository.FindOneAsync(id, cancel);
             if (foundPermission is null)
             {
-                throw new NotFoundException($"Permission Not Found, {id}");
+                throw new NotFoundException($"Permission Not Found, ID = {id}");
             }
             var removedPermission = await _permissionRepository.RemoveAsync(id, cancel);
             return _mapper.Map<PermissionViewModel>(removedPermission);

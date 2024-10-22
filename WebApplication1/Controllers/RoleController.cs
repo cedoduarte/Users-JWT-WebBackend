@@ -84,8 +84,8 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
-                _logger.LogWarning($"Role with name '{updateRoleDto.Name}' Not Found, Message: {ex.Message}");
-                return NotFound($"Role with name '{updateRoleDto.Name}' Not Found");
+                _logger.LogWarning($"Role with ID '{updateRoleDto.Id}' Not Found, Message: {ex.Message}");
+                return NotFound($"Role with ID '{updateRoleDto.Id}' Not Found");
             }
             catch (Exception ex)
             {

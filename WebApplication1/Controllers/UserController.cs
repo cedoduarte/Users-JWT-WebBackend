@@ -30,6 +30,11 @@ namespace WebApplication1.Controllers
             {
                 return Ok(await _userService.CreateAsync(createUserDto, cancel));
             }
+            catch (NotFoundException ex)
+            {
+                _logger.LogWarning($"Role with ID {createUserDto.RoleId} Not Found, Message: {ex.Message}");
+                return NotFound($"Role with ID {createUserDto.RoleId} Not Found");
+            }
             catch (Exception ex)
             {
                 _logger.LogError($"An unexpected error occurred: {ex.Message}");
@@ -84,8 +89,8 @@ namespace WebApplication1.Controllers
             }
             catch (NotFoundException ex)
             {
-                _logger.LogWarning($"User with username '{updateUserDto.Username}' Not Found, Message: {ex.Message}");
-                return NotFound($"User with username '{updateUserDto.Username}' Not Found");
+                _logger.LogWarning($"User with ID '{updateUserDto.Id}' Not Found, Message: {ex.Message}");
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
