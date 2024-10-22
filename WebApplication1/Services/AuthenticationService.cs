@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Authentication;
 using WebApplication1.DTOs;
+using WebApplication1.Exceptions;
 using WebApplication1.Models;
 using WebApplication1.Repositories.Interfaces;
 using WebApplication1.Services.Interfaces;
@@ -41,7 +41,6 @@ namespace WebApplication1.Services
                 Date = DateTime.UtcNow
             };
             var createdAuthentication = await _authenticationRepository.CreateAsync(newAuthentication, cancel);
-            // todo... falta ver si createdAuthentication viene full desde ahorita o talvez hace falta hacer un query con include full
             return _mapper.Map<AuthenticationViewModel>(createdAuthentication);
         }
     }
