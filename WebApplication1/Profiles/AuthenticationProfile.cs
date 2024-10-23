@@ -8,9 +8,7 @@ namespace WebApplication1.Profiles
     {
         public AuthenticationProfile()
         {
-            CreateMap<Authentication, AuthenticationViewModel>()
-                .ForMember(x => x.Username, y => y.MapFrom(z => z.User!.Username))
-                .ForMember(x => x.Email, y => y.MapFrom(z => z.User!.Email));
+            CreateMap<Authentication, AuthenticationViewModel>().ReverseMap();
         }
     }
 }

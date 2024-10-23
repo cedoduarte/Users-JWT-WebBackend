@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WebApplication1.DTOs;
 using WebApplication1.Exceptions;
 using WebApplication1.Services.Interfaces;
@@ -7,15 +9,21 @@ namespace WebApplication1.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class RoleController : Controller
     {
         private readonly ILogger<RoleController> _logger;
         private readonly IRoleService _roleService;
+        private readonly WebApplication1.Services.Interfaces.IAuthorizationService _authorizationService;
 
-        public RoleController(ILogger<RoleController> logger, IRoleService roleService)
+        public RoleController(
+            ILogger<RoleController> logger, 
+            IRoleService roleService, 
+            Services.Interfaces.IAuthorizationService authorizationService)
         {
             _logger = logger;
             _roleService = roleService;
+            _authorizationService = authorizationService;
         }
 
         [HttpPost]
@@ -28,7 +36,14 @@ namespace WebApplication1.Controllers
             }
             try
             {
-                return Ok(await _roleService.CreateAsync(createRoleDto, cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "create", cancel))
+                {
+                    return Ok(await _roleService.CreateAsync(createRoleDto, cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }                
             }
             catch (Exception ex)
             {
@@ -42,7 +57,14 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                return Ok(await _roleService.FindAllAsync(cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "read", cancel))
+                {
+                    return Ok(await _roleService.FindAllAsync(cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }                
             }
             catch (Exception ex)
             {
@@ -56,7 +78,14 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                return Ok(await _roleService.FindOneAsync(id, cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "read", cancel))
+                {
+                    return Ok(await _roleService.FindOneAsync(id, cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }                
             }
             catch (NotFoundException ex)
             {
@@ -80,7 +109,14 @@ namespace WebApplication1.Controllers
             }
             try
             {
-                return Ok(await _roleService.UpdateAsync(updateRoleDto, cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "update", cancel))
+                {
+                    return Ok(await _roleService.UpdateAsync(updateRoleDto, cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }                
             }
             catch (NotFoundException ex)
             {
@@ -99,7 +135,14 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                return Ok(await _roleService.SoftDeleteAsync(id, cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "delete", cancel))
+                {
+                    return Ok(await _roleService.SoftDeleteAsync(id, cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }                
             }
             catch (NotFoundException ex)
             {

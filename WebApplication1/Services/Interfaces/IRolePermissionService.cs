@@ -7,6 +7,7 @@ namespace WebApplication1.Services.Interfaces
     {
         Task<RolePermissionViewModel> CreateAsync(CreateRolePermissionDto createRolePermissionDto, CancellationToken cancel = default);
         Task<IEnumerable<RolePermissionViewModel>> FindAllAsync(CancellationToken cancel = default);
+        Task<IEnumerable<PermissionViewModel>> GetPermissions(int roleId, CancellationToken cancel = default);
         Task<RolePermissionViewModel> RemoveAsync(int roleId, int permissionId, CancellationToken cancel = default);
     }
 }

@@ -61,6 +61,16 @@ namespace WebApplication1.Services
             return _mapper.Map<IEnumerable<RolePermissionViewModel>>(rolePermissionList);
         }
 
+        public async Task<IEnumerable<PermissionViewModel>> GetPermissions(int roleId, CancellationToken cancel)
+        {
+            var permissions = await _dbContext.RolePermissions
+                .Where(x => x.RoleId == roleId)
+                .AsNoTracking()
+                .Select(x => x.Permission)
+                .ToListAsync(cancel);
+            return _mapper.Map<IEnumerable<PermissionViewModel>>(permissions);
+        }
+
         public async Task<RolePermissionViewModel> RemoveAsync(int roleId, int permissionId, CancellationToken cancel)
         {
             var foundRolePermission = await _dbContext.RolePermissions

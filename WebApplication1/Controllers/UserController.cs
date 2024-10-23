@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WebApplication1.DTOs;
 using WebApplication1.Exceptions;
 using WebApplication1.Services.Interfaces;
@@ -7,20 +9,26 @@ namespace WebApplication1.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class UserController : Controller
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
+        private readonly WebApplication1.Services.Interfaces.IAuthorizationService _authorizationService;        
 
-        public UserController(ILogger<UserController> logger, IUserService userService)
+        public UserController(
+            ILogger<UserController> logger, 
+            IUserService userService,
+            WebApplication1.Services.Interfaces.IAuthorizationService authorizationService)
         {
             _logger = logger;
             _userService = userService;
+            _authorizationService = authorizationService;
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateUserDto createUserDto, CancellationToken cancel)
-        {
+        {      
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning($"CreateUserDto has validation errors: {ModelState}");
@@ -28,12 +36,19 @@ namespace WebApplication1.Controllers
             }
             try
             {
-                return Ok(await _userService.CreateAsync(createUserDto, cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "create", cancel))
+                {
+                    return Ok(await _userService.CreateAsync(createUserDto, cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }
             }
             catch (NotFoundException ex)
             {
-                _logger.LogWarning($"Role with ID {createUserDto.RoleId} Not Found, Message: {ex.Message}");
-                return NotFound($"Role with ID {createUserDto.RoleId} Not Found");
+                _logger.LogWarning(ex.Message);
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
@@ -47,7 +62,14 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                return Ok(await _userService.FindAllAsync(cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "read", cancel))
+                {
+                    return Ok(await _userService.FindAllAsync(cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }
             }
             catch (Exception ex)
             {
@@ -61,7 +83,14 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                return Ok(await _userService.FindOneAsync(id, cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "read", cancel))
+                {
+                    return Ok(await _userService.FindOneAsync(id, cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }                
             }
             catch (NotFoundException ex)
             {
@@ -85,7 +114,14 @@ namespace WebApplication1.Controllers
             }
             try
             {
-                return Ok(await _userService.UpdateAsync(updateUserDto, cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "update", cancel))
+                {
+                    return Ok(await _userService.UpdateAsync(updateUserDto, cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }
             }
             catch (NotFoundException ex)
             {
@@ -104,7 +140,14 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                return Ok(await _userService.SoftDeleteAsync(id, cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "delete", cancel))
+                {
+                    return Ok(await _userService.SoftDeleteAsync(id, cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }
             }
             catch (NotFoundException ex)
             {

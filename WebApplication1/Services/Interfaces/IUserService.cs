@@ -8,6 +8,7 @@ namespace WebApplication1.Services.Interfaces
         Task<UserViewModel> CreateAsync(CreateUserDto createUserDto, CancellationToken cancel = default);
         Task<IEnumerable<UserViewModel>> FindAllAsync(CancellationToken cancel = default);
         Task<UserViewModel> FindOneAsync(int id, CancellationToken cancel = default);
+        Task<UserViewModel> FindOneAsync(string username, CancellationToken cancel = default);
         Task<UserViewModel> UpdateAsync(UpdateUserDto updateUserDto, CancellationToken cancel = default);
         Task<UserViewModel> SoftDeleteAsync(int id, CancellationToken cancel = default);
         Task<UserViewModel> RemoveAsync(int id, CancellationToken cancel = default);

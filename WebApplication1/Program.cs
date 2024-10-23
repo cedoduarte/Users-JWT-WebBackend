@@ -1,6 +1,10 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using System.Text.Json.Serialization;
+using WebApplication1.Middlewares;
 using WebApplication1.Models;
 using WebApplication1.Models.Interfaces;
 using WebApplication1.Profiles;
@@ -35,6 +39,23 @@ namespace WebApplication1
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddAuthentication(options => 
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+                };
+            });
 
             // repositories
             builder.Services.AddTransient<IRepository<User>, Repository<User>>();
@@ -51,6 +72,8 @@ namespace WebApplication1
             builder.Services.AddTransient<IUserRoleService, UserRoleService>();
             builder.Services.AddTransient<IRolePermissionService, RolePermissionService>();
             builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
+            builder.Services.AddTransient<WebApplication1.Services.Interfaces.IAuthorizationService,
+                                          WebApplication1.Services.AuthorizationService>();
 
             builder.Services.AddSingleton(new MapperConfiguration(configuration =>
             {
@@ -84,7 +107,7 @@ namespace WebApplication1
                 app.UseSwaggerUI();
             }
             app.UseHttpsRedirection();
-            app.UseAuthorization();
+            app.UseAuthorization(builder.Configuration["Token"]!);
             app.MapControllers();
             app.Run();
         }

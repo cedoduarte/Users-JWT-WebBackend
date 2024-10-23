@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WebApplication1.DTOs;
 using WebApplication1.Exceptions;
 using WebApplication1.Services.Interfaces;
@@ -7,15 +9,21 @@ namespace WebApplication1.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class RolePermissionController : Controller
     {
         private readonly ILogger<RolePermissionController> _logger;
         private readonly IRolePermissionService _rolePermissionService;
+        private readonly WebApplication1.Services.Interfaces.IAuthorizationService _authorizationService;
 
-        public RolePermissionController(ILogger<RolePermissionController> logger, IRolePermissionService rolePermissionService)
+        public RolePermissionController(
+            ILogger<RolePermissionController> logger, 
+            IRolePermissionService rolePermissionService, 
+            Services.Interfaces.IAuthorizationService authorizationService)
         {
             _logger = logger;
             _rolePermissionService = rolePermissionService;
+            _authorizationService = authorizationService;
         }
 
         [HttpPost]
@@ -28,7 +36,14 @@ namespace WebApplication1.Controllers
             }
             try
             {
-                return Ok(await _rolePermissionService.CreateAsync(createRolePermissionDto, cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "create", cancel))
+                {
+                    return Ok(await _rolePermissionService.CreateAsync(createRolePermissionDto, cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }                
             }
             catch (NotFoundException ex)
             {
@@ -47,7 +62,14 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                return Ok(await _rolePermissionService.FindAllAsync(cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "read", cancel))
+                {
+                    return Ok(await _rolePermissionService.FindAllAsync(cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }                
             }
             catch (Exception ex)
             {
@@ -61,7 +83,14 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                return Ok(await _rolePermissionService.RemoveAsync(roleId, permissionId, cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "delete", cancel))
+                {
+                    return Ok(await _rolePermissionService.RemoveAsync(roleId, permissionId, cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }                
             }
             catch (NotFoundException ex)
             {

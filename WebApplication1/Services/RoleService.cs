@@ -53,6 +53,19 @@ namespace WebApplication1.Services
             return _mapper.Map<RoleViewModel>(foundRole);
         }
 
+        public async Task<RoleViewModel> FindOneAsync(string name, CancellationToken cancel)
+        {
+            var foundRole = await _dbContext.Roles
+                .Where(x => !x.IsDeleted && string.Equals(x.Name, name))
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancel);
+            if (foundRole is null)
+            {
+                throw new NotFoundException($"Role Not Found, Name = {name}");
+            }
+            return _mapper.Map<RoleViewModel>(foundRole);
+        }
+
         public async Task<RoleViewModel> UpdateAsync(UpdateRoleDto updateRoleDto, CancellationToken cancel)
         {
             var foundRole = await _dbContext.Roles

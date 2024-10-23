@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WebApplication1.DTOs;
 using WebApplication1.Exceptions;
 using WebApplication1.Services.Interfaces;
@@ -7,15 +9,21 @@ namespace WebApplication1.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class UserRoleController : Controller
     {
         private readonly ILogger<UserRoleController> _logger;
         private readonly IUserRoleService _userRoleService;
+        private readonly WebApplication1.Services.Interfaces.IAuthorizationService _authorizationService;
 
-        public UserRoleController(ILogger<UserRoleController> logger, IUserRoleService userRoleService)
+        public UserRoleController(
+            ILogger<UserRoleController> logger, 
+            IUserRoleService userRoleService, 
+            Services.Interfaces.IAuthorizationService authorizationService)
         {
             _logger = logger;
             _userRoleService = userRoleService;
+            _authorizationService = authorizationService;
         }
 
         [HttpGet]
@@ -23,7 +31,14 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                return Ok(await _userRoleService.FindAllAsync(cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "read", cancel))
+                {
+                    return Ok(await _userRoleService.FindAllAsync(cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }                
             }
             catch (Exception ex)
             {
@@ -37,7 +52,14 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                return Ok(await _userRoleService.FindOneByUserIdAsync(userId, cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "read", cancel))
+                {
+                    return Ok(await _userRoleService.FindOneByUserIdAsync(userId, cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }                
             }
             catch (NotFoundException ex)
             {
@@ -61,7 +83,14 @@ namespace WebApplication1.Controllers
             }
             try
             {
-                return Ok(await _userRoleService.UpdateAsync(updateUserRoleDto, cancel));
+                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "update", cancel))
+                {
+                    return Ok(await _userRoleService.UpdateAsync(updateUserRoleDto, cancel));
+                }
+                else
+                {
+                    return Forbid();
+                }                
             }
             catch (NotFoundException ex)
             {

@@ -71,6 +71,19 @@ namespace WebApplication1.Services
             return _mapper.Map<UserViewModel>(foundUser);
         }
 
+        public async Task<UserViewModel> FindOneAsync(string username, CancellationToken cancel)
+        {
+            var foundUser = await _dbContext.Users
+                .Where(x => !x.IsDeleted && string.Equals(x.Username, username))
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancel);
+            if (foundUser is null)
+            {
+                throw new NotFoundException($"User Not Found, Username = {username}");
+            }
+            return _mapper.Map<UserViewModel>(foundUser);
+        }
+
         public async Task<UserViewModel> UpdateAsync(UpdateUserDto updateUserDto, CancellationToken cancel)
         {
             var foundUser = await _dbContext.Users
