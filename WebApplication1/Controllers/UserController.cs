@@ -9,7 +9,6 @@ namespace WebApplication1.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize]
     public class UserController : Controller
     {
         private readonly ILogger<UserController> _logger;
@@ -58,6 +57,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> FindAll(CancellationToken cancel)
         {
             try
@@ -79,6 +79,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> FindOne([FromRoute] int id, CancellationToken cancel)
         {
             try
@@ -105,6 +106,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         public async Task<IActionResult> Update([FromBody] UpdateUserDto updateUserDto, CancellationToken cancel)
         {
             if (!ModelState.IsValid)
@@ -136,6 +138,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> Remove([FromRoute] int id, CancellationToken cancel)
         {
             try
