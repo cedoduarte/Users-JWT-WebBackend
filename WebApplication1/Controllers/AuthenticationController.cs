@@ -43,12 +43,12 @@ namespace WebApplication1.Controllers
             }
             try
             {
+                var authentication = await _authenticationService.AuthenticateAsync(authenticateDto, cancel);
+                string token = GetJwtToken(authenticateDto.Username!, await GetRoleByUsername(authenticateDto.Username!), TokenExpirationSeconds);                
                 var authenticatedDto = new AuthenticatedDto()
                 {
-                    Token = GetJwtToken(authenticateDto.Username!, 
-                                        await GetRoleByUsername(authenticateDto.Username!),
-                                        TokenExpirationSeconds),
-                    Authentication = await _authenticationService.AuthenticateAsync(authenticateDto, cancel)
+                    Token = token,
+                    Authentication = authentication
                 };
                 return Ok(authenticatedDto);
             }
