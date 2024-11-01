@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using WebApplication1.DTOs;
 using WebApplication1.Exceptions;
 using WebApplication1.Services.Interfaces;
+using WebApplication1.Shared;
 
 namespace WebApplication1.Controllers
 {
@@ -36,9 +36,13 @@ namespace WebApplication1.Controllers
             }
             try
             {
-                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "create", cancel))
+                if (await _authorizationService.HasPermissionAsync(
+                    User.FindFirst(Constants.Jwt.UserIdClaim)!.Value, 
+                    Constants.Permissions.Create,
+                    cancel))
                 {
-                    return Ok(await _permissionService.CreateAsync(createPermissionDto, cancel));
+                    var createdPermission = await _permissionService.CreateAsync(createPermissionDto, cancel);
+                    return CreatedAtAction(nameof(FindOne), new { id = createdPermission.Id }, createdPermission);
                 }
                 else
                 {
@@ -57,7 +61,10 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "read", cancel))
+                if (await _authorizationService.HasPermissionAsync(
+                    User.FindFirst(Constants.Jwt.UserIdClaim)!.Value, 
+                    Constants.Permissions.Read,
+                    cancel))
                 {
                     return Ok(await _permissionService.FindAllAsync(cancel));
                 }
@@ -78,7 +85,10 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "read", cancel))
+                if (await _authorizationService.HasPermissionAsync(
+                    User.FindFirst(Constants.Jwt.UserIdClaim)!.Value,
+                    Constants.Permissions.Read, 
+                    cancel))
                 {
                     return Ok(await _permissionService.FindOneAsync(id, cancel));
                 }
@@ -109,7 +119,10 @@ namespace WebApplication1.Controllers
             }
             try
             {
-                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "update", cancel))
+                if (await _authorizationService.HasPermissionAsync(
+                    User.FindFirst(Constants.Jwt.UserIdClaim)!.Value,
+                    Constants.Permissions.Update,
+                    cancel))
                 {
                     return Ok(await _permissionService.UpdateAsync(updatePermissionDto, cancel));
                 }
@@ -135,7 +148,10 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "delete", cancel))
+                if (await _authorizationService.HasPermissionAsync(
+                    User.FindFirst(Constants.Jwt.UserIdClaim)!.Value,
+                    Constants.Permissions.Delete,
+                    cancel))
                 {
                     return Ok(await _permissionService.SoftDeleteAsync(id, cancel));
                 }

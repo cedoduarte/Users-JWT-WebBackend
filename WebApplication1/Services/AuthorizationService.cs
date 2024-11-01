@@ -1,34 +1,39 @@
-﻿using WebApplication1.Services.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using WebApplication1.Models;
+using WebApplication1.Models.Interfaces;
+using WebApplication1.Services.Interfaces;
 
 namespace WebApplication1.Services
 {
     public class AuthorizationService : IAuthorizationService
     {
-        private readonly ILogger<AuthorizationService> _logger;
-        private readonly IRoleService _roleService;
-        private readonly IRolePermissionService _rolePermissionService;
+        private readonly IAppDbContext _dbContext;
 
-        public AuthorizationService(
-            ILogger<AuthorizationService> logger,
-            IRoleService roleService,
-            IRolePermissionService rolePermissionService)
+        public AuthorizationService(AppDbContext dbContext)
         {
-            _logger = logger;
-            _roleService = roleService;
-            _rolePermissionService = rolePermissionService;
+            _dbContext = dbContext;
         }
 
-        public async Task<bool> HasPermissionAsync(string? role, string permission, CancellationToken cancel)
+        public async Task<bool> HasPermissionAsync(string userIdString, string requiredPermission, CancellationToken cancel)
         {
-            if (role is null)
+            if (!int.TryParse(userIdString, out int userId))
             {
-                _logger.LogWarning("User role is not found in the claims");
                 return false;
             }
-            var foundRole = await _roleService.FindOneAsync(role!, cancel);
-            var foundPermissions = await _rolePermissionService.GetPermissions(foundRole.Id, cancel);
-            var foundPermission = foundPermissions.Where(x => string.Equals(x.Name, permission)).FirstOrDefault();
-            return foundPermission is not null;
+
+            var hasPermission = await _dbContext.UserRoles
+                .Where(ur => ur.UserId == userId)
+                .Join(_dbContext.RolePermissions,
+                      ur => ur.RoleId,
+                      rp => rp.RoleId,
+                      (ur, rp) => rp.PermissionId)
+                .Join(_dbContext.Permissions,
+                      rpPermissionId => rpPermissionId,
+                      p => p.Id,
+                      (rpPermissionId, p) => p)
+                .AnyAsync(p => p.Name == requiredPermission && !p.IsDeleted, cancel);
+
+            return hasPermission;
         }
     }
 }

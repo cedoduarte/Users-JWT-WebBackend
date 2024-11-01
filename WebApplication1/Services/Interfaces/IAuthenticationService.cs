@@ -5,6 +5,7 @@ namespace WebApplication1.Services.Interfaces
 {
     public interface IAuthenticationService
     {
-        Task<AuthenticationViewModel> AuthenticateAsync(AuthenticateDto authenticateDto, CancellationToken cancel = default);
+        Task<(AuthenticationViewModel, string)> AuthenticateAsync(AuthenticateDto authenticateDto, CancellationToken cancel = default);
+        string GetJwtToken(int userId, int expirationSeconds);
     }
 }

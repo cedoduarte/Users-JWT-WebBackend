@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using WebApplication1.DTOs;
 using WebApplication1.Exceptions;
+using WebApplication1.Services;
 using WebApplication1.Services.Interfaces;
+using WebApplication1.Shared;
 
 namespace WebApplication1.Controllers
 {
@@ -36,9 +37,13 @@ namespace WebApplication1.Controllers
             }
             try
             {
-                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "create", cancel))
+                if (await _authorizationService.HasPermissionAsync(
+                    User.FindFirst(Constants.Jwt.UserIdClaim)!.Value, 
+                    Constants.Permissions.Create, 
+                    cancel))
                 {
-                    return Ok(await _rolePermissionService.CreateAsync(createRolePermissionDto, cancel));
+                    var createdRolePermission = await _rolePermissionService.CreateAsync(createRolePermissionDto, cancel);
+                    return CreatedAtAction(nameof(FindAll), new { id = createdRolePermission.Id }, createdRolePermission);
                 }
                 else
                 {
@@ -62,7 +67,10 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "read", cancel))
+                if (await _authorizationService.HasPermissionAsync(
+                    User.FindFirst(Constants.Jwt.UserIdClaim)!.Value, 
+                    Constants.Permissions.Read,
+                    cancel))
                 {
                     return Ok(await _rolePermissionService.FindAllAsync(cancel));
                 }
@@ -83,7 +91,10 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                if (await _authorizationService.HasPermissionAsync(User.FindFirst(ClaimTypes.Role)?.Value, "delete", cancel))
+                if (await _authorizationService.HasPermissionAsync(
+                    User.FindFirst(Constants.Jwt.UserIdClaim)!.Value, 
+                    Constants.Permissions.Delete, 
+                    cancel))
                 {
                     return Ok(await _rolePermissionService.RemoveAsync(roleId, permissionId, cancel));
                 }
